@@ -11,7 +11,7 @@ const errorHandler = require("./helpers/error-handler");
 app.use(cors());
 app.options("*", cors());
 
-//middleware
+///middleware
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(authJwt());
@@ -41,8 +41,11 @@ mongoose.connect('mongodb+srv://pavansudeerk:Pavan%401405@cluster0.ynehf.mongodb
 
 
 //Server
-app.listen(3000, () => {
-  console.log("server is running http://localhost:3000");
+// app.listen(3000, () => {
+//   console.log("server is running http://localhost:3000");
+// });
+
+// deployment
+app.listen(process.env.SERVER_PORT || 8000, () => {
+  console.log('Server Started PORT ==> ', process.env.SERVER_PORT);
 });
-
-
