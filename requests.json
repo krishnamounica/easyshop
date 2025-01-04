@@ -1,0 +1,40 @@
+=================add product=================
+{
+        "name": "product1",
+        "description": "msnn description",
+        "richDescription": "req.body.richDescription",
+        "image": "`${basePath}${fileName}`", // "http://localhost:3000/public/upload/image-2323232"
+        "brand": "india",
+        "price": 100,
+        "category": "req.body.category",
+        "countInStock": 50,
+        "rating": 4,
+        "numReviews": 5,
+        "isFeatured": true
+    }
+==========================add category================
+    {
+        "_id": "677817e00108570bc0d4afde",
+        "name": "cat1",
+        "icon": "",
+        "color": "red",
+        "__v": 0,
+        "id": "677817e00108570bc0d4afde"
+    }
+    ----------------------------------------------
+    {
+        "name": "suresh",
+        "email": "my@gmail.com",
+        "passwordHash": "$2a$10$jgvtx2w2Vefa1GgKN6SlNevbbNBNJ3/CEKzg4Om1oaIUgGDsgtL8C",
+        "phone": "9052570870",
+        "isAdmin": true,
+        "street": "req.body.street",
+        "apartment": "ganesh",
+        "zip": "500090",
+        "city": "hyd",
+        "country": "india",
+        "_id": "6779180488fbde331f4187f9",
+        "__v": 0,
+        "id": "6779180488fbde331f4187f9"
+    }
+    ----------------------------
