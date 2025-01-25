@@ -66,6 +66,7 @@ router.put('/:id',async (req, res)=> {
             zip: req.body.zip,
             city: req.body.city,
             country: req.body.country,
+            requests:req.body.requests
         },
         { new: true}
     )
@@ -93,7 +94,7 @@ router.post('/login', async (req,res) => {
             {expiresIn : '1d'}
         )
        
-        res.status(200).send({user: user.email , token: token}) 
+        res.status(200).send({user: user.email , token: token, requests: user.requests,id : user.id,userName : user.name}) 
     } else {
        res.status(400).send('password is wrong!');
     }
@@ -103,6 +104,7 @@ router.post('/login', async (req,res) => {
 
 
 router.post('/register', async (req,res)=>{
+    console.log(req,"======")
     let user = new User({
         name: req.body.name,
         email: req.body.email,

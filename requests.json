@@ -38,3 +38,45 @@
         "id": "6779180488fbde331f4187f9"
     }
     ----------------------------
+    http://192.168.1.8:3000/api/v1/categories  
+    {
+        "name": "categorybbn2",
+        "icon": "iconcategory",
+        "color": "blue",
+        "_id": "67908d8c3c098da1a7958e1a",
+        "__v": 0,
+        "id": "67908d8c3c098da1a7958e1a"
+    }
+    --------------
+    http://192.168.1.7:3000/api/v1/products?categories=67908d8c3c098da1a7958e1a
+    ----------------------------------
+    curl --location --request PUT 'http://192.168.1.6:3000/api/v1/users/6793c659d5afe39bf7258d57' \
+--header 'secret: my-dog-is-nice' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzhmYzMzODdiNWJmNDFlNjQyN2VjNDkiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3Mzc3Mzc5MDcsImV4cCI6MTczNzgyNDMwN30.DLiBdPxW600aHVZYaB5bnmWrdV2B54LnGLRd31kwJQw' \
+--data-raw '{
+    "name": "test3",
+    "email": "test@gmail.com",
+    "password": "123456",
+   
+    "isAdmin": true,
+    "street": "",
+    "apartment": "",
+    "zip": "500090",
+    "city": "hyderabad",
+    "country": "india",
+    "requests": {
+        "address": "",
+        "area": "Poojitha enclave",
+        "building": "Saketh elite",
+        "date": "2025-01-24T16:29:00.000Z",
+        "district": "Ranga reddy ",
+        "flatNumber": "G6",
+        "name": "Ashwin",
+        "occasion": "select occassion",
+        "phone": "9052570870",
+        "pincode": "500090",
+        "relation": "uncle",
+        "state": "Telangana "
+    }
+}'
