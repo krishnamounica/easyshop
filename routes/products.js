@@ -98,7 +98,9 @@ router.put('/:id', uploadOptions.single('image'), async (req, res) => {
 
     if (file) {
         const fileName = file.filename;
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const basePath = `https://github.com/krishnamounica/easyshop/tree/main/public/uploads/`;
+
         imagepath = `${basePath}${fileName}`;
     } else {
         imagepath = product.image;
