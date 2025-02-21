@@ -110,7 +110,7 @@ router.get(`/:id`, async (req, res) => {
 //     const base64Image = imageBuffer.toString('base64');
 
 //     // GitHub repository details
-//     const GITHUB_TOKEN = "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"; // Use a secure way to store this
+// 
 //     const REPO_OWNER = "krishnamounica";
 //     const REPO_NAME = "easyshop";
 //     const FILE_PATH = `public/uploads/${fileName}`; // Path inside the repo
