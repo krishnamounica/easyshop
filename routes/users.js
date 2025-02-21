@@ -101,6 +101,29 @@ router.post('/login', async (req,res) => {
 
     
 })
+// get requests
+// ✅ Get Specific Request by Request ID
+router.get('/:userId/requests/:requestId', async (req, res) => {
+    try {
+        const { userId, requestId } = req.params;
+
+        console.log("Received User ID:", userId);
+        console.log("Received Request ID:", requestId);
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const request = user.requests.find(req => req.id === requestId);
+        if (!request) return res.status(404).json({ message: 'Request not found' });
+
+        res.json(request);
+    } catch (error) {
+        console.error("Error fetching request:", error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 
 
 router.post('/register', async (req,res)=>{
