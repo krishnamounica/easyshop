@@ -4,6 +4,7 @@ const { Category } = require('../models/category');
 const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
+const axios =require('axios');
 
 const FILE_TYPE_MAP = {
     'image/png': 'png',
@@ -51,37 +52,69 @@ router.get(`/:id`, async (req, res) => {
     res.send(product);
 });
 
+
+
 router.post(`/`, uploadOptions.single('image'), async (req, res) => {
     const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).send('Invalid Category');
 
     const file = req.file;
-    
-
-    const fileName = file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-    console.log(basePath, `${fileName}`)
     if (!file) return res.status(400).send('No image in the request');
-    let product = new Product({
-        name: req.body.name,
-        description: req.body.description,
-        richDescription: req.body.richDescription,
-        image: `${basePath}${fileName}`, // "http://localhost:3000/public/upload/image-2323232"
-        brand: req.body.brand,
-        price: req.body.price,
-        category: req.body.category,
-        countInStock: req.body.countInStock,
-        rating: req.body.rating,
-        numReviews: req.body.numReviews,
-        isFeatured: req.body.isFeatured
-    });
 
-    product = await product.save();
+    // Convert image to base64
+    const fs = require('fs');
+    const imageBuffer = fs.readFileSync(file.path);
+    const imageBase64 = imageBuffer.toString('base64');
 
-    if (!product) return res.status(500).send('The product cannot be created');
+    // Upload image to GitHub
+    const githubRepo = "krishnamounica/easyshop";
+    const githubToken = process.env.GITHUB_TOKEN;
+   
+    const fileName = `products/${Date.now()}-${file.originalname}`;
+    
+    try {
+        const response = await axios.put(
+            `https://api.github.com/repos/${githubRepo}/contents/${fileName}`,
+            {
+                message: `Uploaded ${fileName}`,
+                content: imageBase64
+            },
+            {
+                headers: {
+                    Authorization: `token ${githubToken}`,
+                    Accept: "application/vnd.github.v3+json"
+                }
+            }
+        );
 
-    res.send(product);
+        // Get GitHub URL of the uploaded image
+        const imageUrl = response.data.content.download_url;
+
+        // Create Product
+        let product = new Product({
+            name: req.body.name,
+            description: req.body.description,
+            richDescription: req.body.richDescription,
+            image: imageUrl, // GitHub image URL
+            brand: req.body.brand,
+            price: req.body.price,
+            category: req.body.category,
+            countInStock: req.body.countInStock,
+            rating: req.body.rating,
+            numReviews: req.body.numReviews,
+            isFeatured: req.body.isFeatured
+        });
+
+        product = await product.save();
+        if (!product) return res.status(500).send('The product cannot be created');
+
+        res.send(product);
+    } catch (error) {
+        console.error("Error uploading to GitHub:", error);
+        res.status(500).send('Failed to upload image to GitHub');
+    }
 });
+
 
 router.put('/:id', uploadOptions.single('image'), async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
