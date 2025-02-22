@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Product } = require('../models/product');
 const express = require('express');
 const { Category } = require('../models/category');
@@ -5,6 +6,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
 const axios =require('axios');
+
+
 
 const FILE_TYPE_MAP = {
     'image/png': 'png',
@@ -68,7 +71,12 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
 
     // Upload image to GitHub
     const githubRepo = "krishnamounica/easyshop";
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = "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"
+    // process.env.GITHUB_TOKEN;
+    // console.log(githubToken,"==================githubToken==========");
+    // exit();
+    // "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"
+    // 
    
     const fileName = `products/${Date.now()}-${file.originalname}`;
     
