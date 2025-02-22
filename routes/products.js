@@ -71,7 +71,7 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
 
     // Upload image to GitHub
     const githubRepo = "krishnamounica/easyshop";
-    const githubToken = "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"
+    const githubToken = "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"
     // process.env.GITHUB_TOKEN;
     // console.log(githubToken,"==================githubToken==========");
     // exit();
