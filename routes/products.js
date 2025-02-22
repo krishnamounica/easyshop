@@ -6,7 +6,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
 const axios =require('axios');
-
+const fs = require("fs");
 
 
 const FILE_TYPE_MAP = {
@@ -58,47 +58,71 @@ router.get(`/:id`, async (req, res) => {
 
 
 router.post(`/`, uploadOptions.single('image'), async (req, res) => {
-    const category = await Category.findById(req.body.category);
-    if (!category) return res.status(400).send('Invalid Category');
-
-    const file = req.file;
-    if (!file) return res.status(400).send('No image in the request');
-
-    // Convert image to base64
-    const fs = require('fs');
-    const imageBuffer = fs.readFileSync(file.path);
-    const imageBase64 = imageBuffer.toString('base64');
-
-    // Upload image to GitHub
-    const githubRepo = "krishnamounica/easyshop";
-    const githubToken = "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"
-    // process.env.GITHUB_TOKEN;
-    // console.log(githubToken,"==================githubToken==========");
-    // exit();
-    // "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"
-    // 
-   
-    const fileName = `products/${Date.now()}-${file.originalname}`;
-    
     try {
+        // Validate category
+        const category = await Category.findById(req.body.category);
+         "67791b1988fbde331f4187fe"
+        
+        if (!category) return res.status(400).send("Invalid Category");
+
+        // Validate file upload
+        const file = req.file;
+        if (!file) return res.status(400).send("No image in the request");
+
+        // Read and encode image
+        const imageBuffer = fs.readFileSync(file.path);
+        const imageBase64 = imageBuffer.toString("base64");
+
+        // GitHub Configuration
+        const githubRepo = "krishnamounica/easyshop";
+        const githubToken = "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";
+        console.log(githubToken,"==========githubToken======")
+        const githubOwner = "krishnamounica"; // Change this if needed
+        const branch = "main"; // Change if using a different branch
+        const fileName = `products/${Date.now()}-${file.originalname}`;
+
+        if (!githubToken) {
+            return res.status(500).send("GitHub token is missing");
+        }
+
+        // Check if file exists to get `sha`
+        let sha = null;
+        try {
+            const existingFile = await axios.get(
+                `https://api.github.com/repos/${githubRepo}/contents/${fileName}`,
+                {
+                    headers: {
+                        Authorization: `token ${githubToken}`,
+                        Accept: "application/vnd.github.v3+json",
+                    },
+                }
+            );
+            sha = existingFile.data.sha; // Required if updating an existing file
+        } catch (err) {
+            // File does not exist, continue without `sha`
+        }
+
+        // Upload image to GitHub
         const response = await axios.put(
             `https://api.github.com/repos/${githubRepo}/contents/${fileName}`,
             {
                 message: `Uploaded ${fileName}`,
-                content: imageBase64
+                content: imageBase64,
+                branch: branch,
+                ...(sha ? { sha } : {}), // Include `sha` only if file exists
             },
             {
                 headers: {
                     Authorization: `token ${githubToken}`,
-                    Accept: "application/vnd.github.v3+json"
-                }
+                    Accept: "application/vnd.github.v3+json",
+                },
             }
         );
 
-        // Get GitHub URL of the uploaded image
-        const imageUrl = response.data.content.download_url;
+        // Construct GitHub raw image URL
+        const imageUrl = `https://raw.githubusercontent.com/${githubRepo}/${branch}/${fileName}`;
 
-        // Create Product
+        // Create and save product
         let product = new Product({
             name: req.body.name,
             description: req.body.description,
@@ -110,63 +134,63 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
             countInStock: req.body.countInStock,
             rating: req.body.rating,
             numReviews: req.body.numReviews,
-            isFeatured: req.body.isFeatured
+            isFeatured: req.body.isFeatured,
         });
 
         product = await product.save();
-        if (!product) return res.status(500).send('The product cannot be created');
+        if (!product) return res.status(500).send("The product cannot be created");
 
         res.send(product);
     } catch (error) {
-        console.error("Error uploading to GitHub:", error);
-        res.status(500).send('Failed to upload image to GitHub');
+        console.error("Error uploading to GitHub:", error.response?.data || error);
+        res.status(500).send("Failed to upload image to GitHub");
     }
 });
 
 
-router.put('/:id', uploadOptions.single('image'), async (req, res) => {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send('Invalid Product Id');
-    }
-    const category = await Category.findById(req.body.category);
-    if (!category) return res.status(400).send('Invalid Category');
+// router.put('/:id', uploadOptions.single('image'), async (req, res) => {
+//     if (!mongoose.isValidObjectId(req.params.id)) {
+//         return res.status(400).send('Invalid Product Id');
+//     }
+//     const category = await Category.findById(req.body.category);
+//     if (!category) return res.status(400).send('Invalid Category');
 
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(400).send('Invalid Product!');
+//     const product = await Product.findById(req.params.id);
+//     if (!product) return res.status(400).send('Invalid Product!');
 
-    const file = req.file;
-    let imagepath;
+//     const file = req.file;
+//     let imagepath;
 
-    if (file) {
-        const fileName = file.filename;
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-        imagepath = `${basePath}${fileName}`;
-    } else {
-        imagepath = product.image;
-    }
+//     if (file) {
+//         const fileName = file.filename;
+//         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+//         imagepath = `${basePath}${fileName}`;
+//     } else {
+//         imagepath = product.image;
+//     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-        req.params.id,
-        {
-            name: req.body.name,
-            description: req.body.description,
-            richDescription: req.body.richDescription,
-            image: imagepath,
-            brand: req.body.brand,
-            price: req.body.price,
-            category: req.body.category,
-            countInStock: req.body.countInStock,
-            rating: req.body.rating,
-            numReviews: req.body.numReviews,
-            isFeatured: req.body.isFeatured
-        },
-        { new: true }
-    );
+//     const updatedProduct = await Product.findByIdAndUpdate(
+//         req.params.id,
+//         {
+//             name: req.body.name,
+//             description: req.body.description,
+//             richDescription: req.body.richDescription,
+//             image: imagepath,
+//             brand: req.body.brand,
+//             price: req.body.price,
+//             category: req.body.category,
+//             countInStock: req.body.countInStock,
+//             rating: req.body.rating,
+//             numReviews: req.body.numReviews,
+//             isFeatured: req.body.isFeatured
+//         },
+//         { new: true }
+//     );
 
-    if (!updatedProduct) return res.status(500).send('the product cannot be updated!');
+//     if (!updatedProduct) return res.status(500).send('the product cannot be updated!');
 
-    res.send(updatedProduct);
-});
+//     res.send(updatedProduct);
+// });
 
 router.delete('/:id', (req, res) => {
     Product.findByIdAndRemove(req.params.id)
