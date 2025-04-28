@@ -13,14 +13,14 @@ router.get(`/`, async (req, res) =>{
     res.send(userList);
 })
 
-router.get('/:id', async(req,res)=>{
-    const user = await User.findById(req.params.id).select('-passwordHash');
+// router.get('/:id', async(req,res)=>{
+//     const user = await User.findById(req.params.id).select('-passwordHash');
 
-    if(!user) {
-        res.status(500).json({message: 'The user with the given ID was not found.'})
-    } 
-    res.status(200).send(user);
-})
+//     if(!user) {
+//         res.status(500).json({message: 'The user with the given ID was not found.'})
+//     } 
+//     res.status(200).send(user);
+// })
 
 router.post('/', async (req,res)=>{
     let user = new User({
@@ -42,6 +42,29 @@ router.post('/', async (req,res)=>{
 
     res.send(user);
 })
+router.post('/guser', async (req,res)=>{
+    let user = await User.findOne({email: req.body.email})
+  
+    
+    if(!user) {
+        const newusers = new User({
+            name: req.body.name,
+            email: req.body.email,
+            isAdmin: false
+        
+        })
+        user = await newusers.save();
+        res.status(200).send({user: user.email , token: req.body.token, 
+            requests: user.requests,
+            id : user.id,userName : user.name}) 
+        
+    }
+ 
+  res.status(200).send({user: user.email , token: "12345", 
+    requests: user.requests,
+    id : user.id,userName : user.name}) 
+})
+
 
 router.put('/:id',async (req, res)=> {
 
@@ -78,13 +101,13 @@ router.put('/:id',async (req, res)=> {
 })
 
 router.post('/login', async (req,res) => {
+   
     const user = await User.findOne({email: req.body.email})
     const secret = process.env.secret;
     if(!user) {
         return res.status(400).send('The user not found');
     }
-
-    if(user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
+    if(user  && bcrypt.compareSync(req.body.password, user.passwordHash)) {
         const token = jwt.sign(
             {
                 userId: user.id,
@@ -94,35 +117,66 @@ router.post('/login', async (req,res) => {
             {expiresIn : '1d'}
         )
        
-        res.status(200).send({user: user.email , token: token, requests: user.requests,id : user.id,userName : user.name}) 
+        res.status(200).send({user: user.email , token: token, 
+            requests: user.requests,
+            id : user.id,userName : user.name}) 
     } else {
        res.status(400).send('password is wrong!');
     }
 
     
 })
-// get requests
 // ✅ Get Specific Request by Request ID
-router.get('/:userId/requests/:requestId', async (req, res) => {
+// router.get('/:userId/:requestId', async (req, res) => {
+//     try {
+//         const { userId, requestId } = req.params;
+
+//         console.log("Received User ID:", userId);
+//         console.log("Received Request ID:", requestId);
+
+//         const user = await User.findById(userId);
+//         if (!user) return res.status(404).json({ message: 'User not found' });
+
+//         const request = user.requests.find(req => req.id === requestId);
+//         if (!request) return res.status(404).json({ message: 'Request not found' });
+
+//         res.json(request);
+//     } catch (error) {
+//         console.error("Error fetching request:", error);
+//         res.status(500).json({ message: error.message });
+//     }
+// });
+
+
+
+
+router.get('/:requestId', async (req, res) => {
     try {
-        const { userId, requestId } = req.params;
+        const requestId = req.params.requestId;
+        console.log("Request ID:", requestId);
 
-        console.log("Received User ID:", userId);
-        console.log("Received Request ID:", requestId);
+        // Find the user containing the request
+        const user = await User.findOne({ "requests.id": requestId });
+        console.log("User Found:", user);
 
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            return res.status(404).json({ message: "Request not found" });
+        }
 
-        const request = user.requests.find(req => req.id === requestId);
-        if (!request) return res.status(404).json({ message: 'Request not found' });
+        // Extract the specific request from the user's requests array
+        const foundRequest = user.requests.find(request => request.id === requestId);
+        console.log("Found Request:", foundRequest);
 
-        res.json(request);
+        if (!foundRequest) {
+            return res.status(404).json({ message: "Request not found" });
+        }
+
+        res.json(foundRequest);
     } catch (error) {
         console.error("Error fetching request:", error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Internal Server Error" });
     }
 });
-
 
 
 
