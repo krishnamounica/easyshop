@@ -18,7 +18,9 @@ function authJwt() {
 
             `${api}/users/login`,
             `${api}/users/register`,
-            `${api}/users/guser`
+            `${api}/users/guser`,
+            `${api}/users/create-order`,
+            `${api}/users/save-payment`,
             // { url: /(.*)/ },
         ]
     });
