@@ -233,7 +233,7 @@ router.get(`/get/count`, async (req, res) =>{
 router.post('/create-order', async (req, res) => {
     try {
         const { amount, currency } = req.body;
-        console.log("============",req.body,"===========")
+        
         const options = {
             amount: 100, // Razorpay accepts paise (multiply by 100)
             currency: currency || "INR",
@@ -241,7 +241,7 @@ router.post('/create-order', async (req, res) => {
         };
 
         const order = await razorpay.orders.create(options);
-        console.log(order,"====order====")
+    
         res.status(200).send({
             success: true,
             orderId: order.id,
@@ -254,51 +254,56 @@ router.post('/create-order', async (req, res) => {
         res.status(500).send({ success: false, message: 'Failed to create order' });
     }
 });
+const fetch = require('node-fetch');
+
 router.post('/save-payment', async (req, res) => {
-    const {
+  const {
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature,
+    productId,
+    userId,
+    amount
+  } = req.body;
+
+  if (!razorpay_payment_id || !razorpay_order_id || !userId || !productId) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+  
+
+  try {
+    const auth = Buffer.from(`rzp_test_Zr4AoaaUCDwWjy:fECCwYuUdur6HdahuurRr7Nm`).toString('base64');
+    const response = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
+      headers: { 'Authorization': `Basic ${auth}` },
+    });
+
+    const paymentDetails = await response.json();
+  
+
+    const payment = new Payment({
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
       productId,
       userId,
-      amount
-    } = req.body;
-  console.log(req.body,"===req.body====")
-    // Validate Razorpay details
-    if (!razorpay_payment_id || !razorpay_order_id || !userId || !productId) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
-    }
-  
-    // Validate userId format
-    // if (!mongoose.Types.ObjectId.isValid(userId)) {
-    //   return res.status(400).json({ success: false, message: 'Invalid userId' });
-    // }
-  
-    try {
-    const payment = new Payment({
-        razorpay_payment_id,
-        razorpay_order_id,
-        razorpay_signature,
-        productId,
-        userId,
-        amount
-      });
-  
-      await payment.save();
-  
-      return res.status(200).json({
-        success: true,
-        message: 'Payment saved successfully',
-        razorpay_payment_id,
-        razorpay_order_id,
-        amount
-      });
-  
-    } catch (err) {
-      console.error('Error saving payment details:', err);
-      return res.status(500).json({ success: false, message: 'Server error saving payment' });
-    }
-  });
+      payment_mode: paymentDetails.method,
+      tax: paymentDetails.tax || 0,
+      amount: amount
+    });
+
+    await payment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Payment saved successfully',
+    });
+
+  } catch (err) {
+    console.error('Error saving payment details:', err);
+    return res.status(500).json({ success: false, message: 'Server error saving payment' });
+  }
+});
+
 
 
 module.exports =router;
