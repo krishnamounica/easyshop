@@ -79,7 +79,7 @@ router.post('/guser', async (req, res) => {
       );
   
       return res.status(200).send({
-        user: user.email,
+        email: user.email,
         token: jwtToken,          // use the JWT here
         requests: user.requests,
         id: user.id,
