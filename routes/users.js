@@ -1,8 +1,17 @@
 const {User} = require('../models/user');
+const Payment = require('../models/payment'); 
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Razorpay = require('razorpay');
+const shortid = require('shortid');
+
+
+const razorpay = new Razorpay({
+    key_id: `rzp_test_Zr4AoaaUCDwWjy`,
+    key_secret: `fECCwYuUdur6HdahuurRr7Nm`
+});
 
 router.get(`/`, async (req, res) =>{
     const userList = await User.find().select('-passwordHash');
@@ -61,7 +70,6 @@ router.post('/guser', async (req,res)=>{
     requests: user.requests,
     id : user.id,userName : user.name}) 
 })
-
 
 router.put('/:id',async (req, res)=> {
 
@@ -222,6 +230,75 @@ router.get(`/get/count`, async (req, res) =>{
         userCount: userCount
     });
 })
+router.post('/create-order', async (req, res) => {
+    try {
+        const { amount, currency } = req.body;
+        console.log("============",req.body,"===========")
+        const options = {
+            amount: 100, // Razorpay accepts paise (multiply by 100)
+            currency: currency || "INR",
+            receipt: shortid.generate(),
+        };
+
+        const order = await razorpay.orders.create(options);
+        console.log(order,"====order====")
+        res.status(200).send({
+            success: true,
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+        });
+
+    } catch (error) {
+        console.error('Error creating Razorpay order:', error);
+        res.status(500).send({ success: false, message: 'Failed to create order' });
+    }
+});
+router.post('/save-payment', async (req, res) => {
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      productId,
+      userId,
+      amount
+    } = req.body;
+  console.log(req.body,"===req.body====")
+    // Validate Razorpay details
+    if (!razorpay_payment_id || !razorpay_order_id || !userId || !productId) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+  
+    // Validate userId format
+    // if (!mongoose.Types.ObjectId.isValid(userId)) {
+    //   return res.status(400).json({ success: false, message: 'Invalid userId' });
+    // }
+  
+    try {
+    const payment = new Payment({
+        razorpay_payment_id,
+        razorpay_order_id,
+        razorpay_signature,
+        productId,
+        userId,
+        amount
+      });
+  
+      await payment.save();
+  
+      return res.status(200).json({
+        success: true,
+        message: 'Payment saved successfully',
+        razorpay_payment_id,
+        razorpay_order_id,
+        amount
+      });
+  
+    } catch (err) {
+      console.error('Error saving payment details:', err);
+      return res.status(500).json({ success: false, message: 'Server error saving payment' });
+    }
+  });
 
 
 module.exports =router;
