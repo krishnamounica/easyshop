@@ -43,24 +43,21 @@ router.post('/', async (req,res)=>{
     res.send(user);
 })
 router.post('/guser', async (req,res)=>{
+    const {token} = req.body
     let user = await User.findOne({email: req.body.email})
-  
-    
     if(!user) {
         const newusers = new User({
             name: req.body.name,
             email: req.body.email,
             isAdmin: false
-        
         })
         user = await newusers.save();
-        res.status(200).send({user: user.email , token: req.body.token, 
+        res.status(200).send({user: user.email , token: token,
             requests: user.requests,
             id : user.id,userName : user.name}) 
-        
     }
- 
-  res.status(200).send({user: user.email , token: "12345", 
+   
+  res.status(200).send({email: user.email , token:token,
     requests: user.requests,
     id : user.id,userName : user.name}) 
 })
