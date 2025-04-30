@@ -51,60 +51,45 @@ router.post('/', async (req,res)=>{
 
     res.send(user);
 })
-router.post('/guser', async (req,res)=>{
-    const {token} = req.body
-    let user = await User.findOne({email: req.body.email})
-    if(!user) {
-        const newusers = new User({
-            name: req.body.name,
-            email: req.body.email,
-            isAdmin: false
-        })
-        user = await newusers.save();
-        res.status(200).send({user: user.email , token: token,
-            requests: user.requests,
-            id : user.id,userName : user.name}) 
-    }
-   
-  res.status(200).send({email: user.email , token:token,
-    requests: user.requests,
-    id : user.id,userName : user.name}) 
-})
-
-router.put('/:id',async (req, res)=> {
-
-    const userExist = await User.findById(req.params.id);
-    let newPassword
-    if(req.body.password) {
-        newPassword = bcrypt.hashSync(req.body.password, 10)
-    } else {
-        newPassword = userExist.passwordHash;
-    }
-
-    const user = await User.findByIdAndUpdate(
-        req.params.id,
+router.post('/guser', async (req, res) => {
+    try {
+      const { name, email, token: googleToken } = req.body;
+      const secret = process.env.secret;
+      let user = await User.findOne({ email });
+      if (!user) {
+        // create new user
+        user = new User({
+          name,
+          email,
+          isAdmin: false,
+          passwordHash: bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10)
+          // we set a random hash since google users don't log in locally
+        });
+        await user.save();
+      }
+  
+      // sign JWT just like in /login
+      const jwtToken = jwt.sign(
         {
-            name: req.body.name,
-            email: req.body.email,
-            passwordHash: newPassword,
-            phone: req.body.phone,
-            isAdmin: req.body.isAdmin,
-            street: req.body.street,
-            apartment: req.body.apartment,
-            zip: req.body.zip,
-            city: req.body.city,
-            country: req.body.country,
-            requests:req.body.requests
+          userId: user.id,
+          isAdmin: user.isAdmin
         },
-        { new: true}
-    )
-
-    if(!user)
-    return res.status(400).send('the user cannot be created!')
-
-    res.send(user);
-})
-
+        secret,
+        { expiresIn: '1d' }
+      );
+  
+      return res.status(200).send({
+        user: user.email,
+        token: jwtToken,          // use the JWT here
+        requests: user.requests,
+        id: user.id,
+        userName: user.name
+      });
+    } catch (err) {
+      console.error('Error in /guser:', err);
+      res.status(500).send({ message: 'Internal server error' });
+    }
+  });
 router.post('/login', async (req,res) => {
    
     const user = await User.findOne({email: req.body.email})
