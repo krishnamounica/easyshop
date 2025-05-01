@@ -12,7 +12,7 @@ function authJwt() {
             { url: /\/public\/uploads(.*)/, methods: ['GET', 'OPTIONS'] },
             { url: /\/api\/v1\/products(.*)/, methods: ['GET', 'OPTIONS'] },
             { url: /\/api\/v1\/categories(.*)/, methods: ['GET', 'OPTIONS'] },
-            // { url: /\/api\/v1\/giftrequests(.*)/, methods: ['GET', 'OPTIONS'] },
+            { url: /\/api\/v1\/giftrequests(.*)/, methods: ['POST', 'OPTIONS'] },
             { url: /\/api\/v1\/orders(.*)/, methods: ['GET', 'OPTIONS', 'POST'] },
             { url: /\/api\/v1\/users\/[^/]+$/, methods: ['PUT'] },
 
@@ -21,6 +21,7 @@ function authJwt() {
             `${api}/users/guser`,
             `${api}/users/create-order`,
             `${api}/users/save-payment`,
+
             // { url: /(.*)/ },
         ]
     });
