@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Razorpay = require('razorpay');
 const shortid = require('shortid');
+const crypto = require('crypto');
+
 
 
 const razorpay = new Razorpay({
