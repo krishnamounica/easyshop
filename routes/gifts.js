@@ -33,4 +33,24 @@ req.body.date = formattedDate;
     }
 });
 
+
+
+// GET all gifts for a specific user
+app.get('/', async (req, res) => {
+  try {
+    const { userName } = req.query;
+
+    if (!userName) {
+      return res.status(400).json({ error: 'UserName is required' });
+    }
+
+    const gifts = await Gift.find({ userName });
+
+    return res.status(200).json(gifts);
+  } catch (error) {
+    console.error('Error fetching gift requests:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = app; // Export the route handler
