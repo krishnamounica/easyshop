@@ -30,3 +30,11 @@ const giftSchema = new mongoose.Schema({
 }, {
   timestamps: true 
 });
+giftSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+giftSchema.set('toJSON', {
+  virtuals: true,
+});
+module.exports = mongoose.model('Gift', giftSchema);
