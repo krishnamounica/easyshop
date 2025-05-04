@@ -1,4 +1,3 @@
-// models/gift.js
 const mongoose = require('mongoose');
 
 // Define the gift schema
@@ -27,18 +26,7 @@ const giftSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   remainingAmount: { type: Number, default: 0 },
   noOfPayments: { type: Number, default: 0 },
-  paymentAmount: { type: Number, default: 0 }, timestamps: true
+  paymentAmount: { type: Number, default: 0 }
+}, {
+  timestamps: true 
 });
-
-// Adding a virtual field for 'id' (MongoDB _id as string)
-giftSchema.virtual('id').get(function () {
-  return this._id.toHexString();
-});
-
-// Setting virtuals to be included in JSON response
-giftSchema.set('toJSON', {
-  virtuals: true,
-});
-
-// Export the model
-module.exports = mongoose.model('Gift', giftSchema); // Correct export
