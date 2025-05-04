@@ -75,5 +75,26 @@ app.put('/update/:id', async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 });
+app.get('/gift/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Gift ID is required' });
+    }
+
+    const gift = await Gift.findById(id);
+
+    if (!gift) {
+      return res.status(404).json({ error: 'Gift not found' });
+    }
+
+    return res.status(200).json({ gift });
+  } catch (error) {
+    console.error('Error fetching gift by ID:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 module.exports = app; // Export the route handler
