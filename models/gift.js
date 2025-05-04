@@ -27,7 +27,7 @@ const giftSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   remainingAmount: { type: Number, default: 0 },
   noOfPayments: { type: Number, default: 0 },
-  paymentAmount: { type: Number, default: 0 }
+  paymentAmount: { type: Number, default: 0 }, timestamps: true
 });
 
 // Adding a virtual field for 'id' (MongoDB _id as string)
