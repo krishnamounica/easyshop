@@ -53,4 +53,27 @@ app.get('/', async (req, res) => {
   }
 });
 
+app.put('/update/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Optional: validate incoming data if needed
+    if (!id) {
+      return res.status(400).json({ error: 'Gift ID is required' });
+    }
+
+    const updatedGift = await Gift.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!updatedGift) {
+      return res.status(404).json({ error: 'Gift not found' });
+    }
+
+    return res.status(200).json({ message: 'Gift updated successfully', gift: updatedGift });
+  } catch (error) {
+    console.error('Error updating gift request:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = app; // Export the route handler
