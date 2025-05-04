@@ -22,7 +22,7 @@ req.body.date = formattedDate;
     try {
         const giftData = new Gift({
             name, phone, relation, occasion, date, flatNumber, building, landmark, district, state, productId, productName, productPrice, status,
-            feedback, payment, sharable, userName, paymentlink, sharablelink, totalAmount, remainingAmount, noOfPayments, pincode
+            feedback, payment, sharable, userName, paymentlink, sharablelink, totalAmount, remainingAmount, noOfPayments, pincode, createdAt: new Date()
         });
 
         await giftData.save();
