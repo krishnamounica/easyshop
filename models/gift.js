@@ -17,7 +17,15 @@ const giftSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   productPrice: { type: Number, required: true, default: 0 },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-  feedback: { type: [String], default: [] },
+  feedback: {
+    type: [
+      {
+        message: String,
+        user: String,
+      },
+    ],
+    default: [],
+  },
   payment: { type: Boolean, default: false },
   sharable: { type: Boolean, default: false },
   userName: { type: String, required: true },
