@@ -36,10 +36,12 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        index: true
     },
     passwordHash: {
         type: String,
         required: false,
+        index:true
     },
     phone: {
         type: String,
