@@ -9,7 +9,7 @@ const paymentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   amount: { type: String, required: true },
   tax: { type: Number },
-  payment_mode: { type: String },
+  payment_mode: { type: Number },
   address: 
     {
       fullName: { type: String, required: true },
