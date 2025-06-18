@@ -292,6 +292,16 @@ router.post('/save-payment', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error saving payment' });
   }
 });
+// Node.js/Express route to fetch payments by userId
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const payments = await Payment.find({ userId });
+    res.json(payments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 
