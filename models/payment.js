@@ -9,6 +9,14 @@ const paymentSchema = new mongoose.Schema({
   amount:{type:String,required:true},
   payment_mode: { type: String },
 tax: { type: Number },
-amount: { type: Number }
+amount: { type: Number },
+ address: {
+    fullName: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String },
+    postalCode: { type: String },
+    country: { type: String },
+  }
 });
 module.exports = mongoose.model('Payment', paymentSchema);
