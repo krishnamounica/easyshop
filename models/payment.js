@@ -10,7 +10,7 @@ const paymentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   tax: { type: Number },
   payment_mode: { type: String },
-  address: [
+  address: 
     {
       fullName: { type: String, required: true },
       street: { type: String, required: true },
@@ -19,7 +19,7 @@ const paymentSchema = new mongoose.Schema({
       postalCode: { type: String },
       country: { type: String },
     }
-  ]
+  
 });
 
 module.exports = mongoose.model('Payment', paymentSchema);
