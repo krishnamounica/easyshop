@@ -7,7 +7,7 @@ const paymentSchema = new mongoose.Schema({
   productId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Product" },
   userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   createdAt: { type: Date, default: Date.now },
-  amount: { type: Number, required: true },
+  amount: { type: String, required: true },
   tax: { type: Number },
   payment_mode: { type: String },
   address: 
