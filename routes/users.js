@@ -250,7 +250,8 @@ router.post('/save-payment', async (req, res) => {
     razorpay_signature,
     productId,
     userId,
-    amount
+    amount,
+    address
   } = req.body;
 
   if (!razorpay_payment_id || !razorpay_order_id || !userId || !productId) {
@@ -275,7 +276,8 @@ router.post('/save-payment', async (req, res) => {
       userId,
       payment_mode: paymentDetails.method,
       tax: paymentDetails.tax || 0,
-      amount: amount
+      amount: amount,
+    address
     });
 
     await payment.save();
