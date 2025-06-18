@@ -222,7 +222,7 @@ router.post('/create-order', async (req, res) => {
         const { amount, currency } = req.body;
         
         const options = {
-            amount: amount, // Razorpay accepts paise (multiply by 100)
+            amount: Math.round(amount), // Razorpay accepts paise (multiply by 100)
             currency: currency || "INR",
             receipt: shortid.generate(),
         };
@@ -276,7 +276,7 @@ router.post('/save-payment', async (req, res) => {
       userId,
       payment_mode: paymentDetails.method,
       tax: paymentDetails.tax || 0,
-      amount: amount,
+      amount: Math.round(amount),
     address
     });
 
