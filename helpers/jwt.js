@@ -15,7 +15,11 @@ function authJwt() {
             { url: /\/api\/v1\/giftrequests(.*)/, methods: ['POST','GET', 'PUT','OPTIONS'] },
             { url: /\/api\/v1\/orders(.*)/, methods: ['GET', 'OPTIONS', 'POST'] },
             { url: /\/api\/v1\/users\/[^/]+$/, methods: ['PUT'] },
+            { url: /\/api\/v1\/users\/address\/[^/]+$/, methods: ['GET'] }
+
             { url: /\/api\/v1\/users\/[^/]+$/, methods: ['GET'] },
+            { url: /\/api\/v1\/users\/address\/[^/]+$/, methods: ['GET'] }
+
 
             `${api}/users/login`,
             `${api}/users/register`,
