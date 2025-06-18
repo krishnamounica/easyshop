@@ -294,7 +294,7 @@ router.post('/save-payment', async (req, res) => {
 });
 // Node.js/Express route to fetch payments by userId
 router.get('/address/:userId', async (req, res) => {
-  const { userId } = req.query;
+  const { userId } = req.params.userId;
   try {
     const payments = await Payment.find({ userId });
     res.json(payments);
