@@ -293,8 +293,8 @@ router.post('/save-payment', async (req, res) => {
   }
 });
 // Node.js/Express route to fetch payments by userId
-router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;
+router.get('/address/', async (req, res) => {
+  const { userId } = req.query;
   try {
     const payments = await Payment.find({ userId });
     res.json(payments);
@@ -302,6 +302,7 @@ router.get('/:userId', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 
