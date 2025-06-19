@@ -251,6 +251,7 @@ router.post('/save-payment', async (req, res) => {
     productId,
     userId,
     amount,
+    productName,
     address
   } = req.body;
 
