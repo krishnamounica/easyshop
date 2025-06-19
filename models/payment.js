@@ -10,6 +10,7 @@ const paymentSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   tax: { type: Number },
   payment_mode: { type: String },
+  productName:{type:String},
   address: 
     {
       fullName: { type: String, required: true },
