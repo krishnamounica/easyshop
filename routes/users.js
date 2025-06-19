@@ -274,6 +274,7 @@ router.post('/save-payment', async (req, res) => {
       razorpay_order_id,
       razorpay_signature,
       productId,
+      productName,
       userId,
       payment_mode: paymentDetails.method,
       tax: paymentDetails.tax || 0,
@@ -303,8 +304,5 @@ router.get('/address/:userId', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-
-
 
 module.exports =router;
