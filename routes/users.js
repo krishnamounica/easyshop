@@ -1,5 +1,6 @@
 const {User} = require('../models/user');
 const Payment = require('../models/payment'); 
+const messages=require('../helpers/occasionMessages');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -304,5 +305,16 @@ router.get('/address/:userId', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+//oocasion
+router.get('/:occasion', (req, res) => {
+  const { occasion } = req.params;
+  const key = occasion.toLowerCase();
+  if (messages[key]) {
+    res.json({ success: true, messages: messages[key] });
+  } else {
+    res.status(404).json({ success: false, message: 'Occasion not found' });
+  }
+});
+
 
 module.exports =router;
