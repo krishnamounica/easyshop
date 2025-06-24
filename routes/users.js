@@ -306,7 +306,7 @@ router.get('/address/:userId', async (req, res) => {
   }
 });
 //oocasion
-router.get('/:occasion', (req, res) => {
+router.get('/occasions/:occasion', (req, res) => {
   const { occasion } = req.params;
   const key = occasion.toLowerCase();
   if (messages[key]) {
